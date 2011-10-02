@@ -7,6 +7,9 @@
  *
  * Copyright (c) 2011 Scott Robbin (srobbin.com)
  * Dual licensed under the MIT and GPL licenses.
+ * 
+ * Added Minimum BG Image width setting
+ * Noah Stokes
 */
 
 (function($) {
@@ -15,7 +18,8 @@
         var defaultSettings = {
             centeredX: true,         // Should we center the image on the X axis?
             centeredY: true,         // Should we center the image on the Y axis?
-            speed: 0                 // fadeIn speed for background after image loads (e.g. "fast" or 500)
+            speed: 0,                 // fadeIn speed for background after image loads (e.g. "fast" or 500)
+            minW: 800        // Min width you want your image to scale to            
         },
         container = $("#backstretch"),
         settings = container.data("settings") || defaultSettings, // If this has been called once before, use the old settings as the default
@@ -90,18 +94,23 @@
                 
                 // Make adjustments based on image ratio
                 // Note: Offset code provided by Peter Baker (http://ptrbkr.com/). Thanks, Peter!
-                if(bgHeight >= rootElement.height()) {
-                    bgOffset = (bgHeight - rootElement.height()) /2;
-                    if(settings.centeredY) $.extend(bgCSS, {top: "-" + bgOffset + "px"});
-                } else {
-                    bgHeight = rootElement.height();
-                    bgWidth = bgHeight * imgRatio;
-                    bgOffset = (bgWidth - rootElement.width()) / 2;
-                    if(settings.centeredX) $.extend(bgCSS, {left: "-" + bgOffset + "px"});
+  //Catch Min Width here
+ 	
+                if(bgWidth >= settings.minW) {
+									if(bgHeight >= rootElement.height()) {	
+            				bgOffset = (bgHeight - rootElement.height()) /2;
+           					if(settings.centeredY) $.extend(bgCSS, {top: "-" + bgOffset + "px"});
+         					} else {
+	            			bgHeight = rootElement.height();	
+           					bgWidth = bgHeight * imgRatio;
+           					bgOffset = (bgWidth - rootElement.width()) / 2;
+            				if(settings.centeredX) $.extend(bgCSS, {left: "-" + bgOffset + "px"});
+         					}
+				         	$("#backstretch img").width( bgWidth ).height( bgHeight ).css(bgCSS);                
                 }
 
-                $("#backstretch, #backstretch img:last").width( bgWidth ).height( bgHeight )
-                                                        .filter("img").css(bgCSS);
+                //$("#backstretch, #backstretch img:last").width( bgWidth ).height( bgHeight )
+                  //                                      .filter("img").css(bgCSS);
             } catch(err) {
                 // IE7 seems to trigger _adjustBG before the image is loaded.
                 // This try/catch block is a hack to let it fail gracefully.
